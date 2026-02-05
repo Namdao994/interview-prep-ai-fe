@@ -1,0 +1,17 @@
+.btn-provider {
+  background-color: var(--background-color-provider-btn);
+  border-color: var(--border-color-provider-btn);
+  color: var(--color-text-provider-btn);
+}
+
+.btn-provider:hover {
+  background-color: var(--background-color-hover-provider-btn) !important;
+  border-color: var(--border-color-hover-provider-btn) !important;
+  color: var(--color-text-hover-provider-btn) !important;
+}
+
+.btn-provider:active {
+  background-color: var(--background-color-active-provider-btn) !important;
+  border-color: var(--border-color-active-provider-btn) !important;
+  color: var(--color-text-active-provider-btn) !important;
+}

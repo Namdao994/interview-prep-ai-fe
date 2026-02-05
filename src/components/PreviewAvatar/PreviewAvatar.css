@@ -1,0 +1,25 @@
+.preview-avatar {
+  width: fit-content;
+  height: fit-content;
+  position: relative;
+}
+
+.preview-avatar__delete-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: white;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: all 0.2s ease;
+}
+.preview-avatar__delete-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.9);
+}
