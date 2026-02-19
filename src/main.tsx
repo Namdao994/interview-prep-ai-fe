@@ -10,14 +10,16 @@ import AppConfigProvider from './providers/AppConfigProvider.tsx/AppConfigProvid
 import './index.css';
 import NotificationProvider from './providers/NotificationProvider/NotificationProvider.tsx';
 createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <AppConfigProvider>
-        <NotificationProvider />
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </AppConfigProvider>
-    </PersistGate>
-  </Provider>
+  <StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <AppConfigProvider>
+          <NotificationProvider />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AppConfigProvider>
+      </PersistGate>
+    </Provider>
+  </StrictMode>,
 );
