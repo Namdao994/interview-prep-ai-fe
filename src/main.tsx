@@ -6,7 +6,7 @@ import 'antd/dist/reset.css';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {store, persistor} from '@/store';
-import AppConfigProvider from './providers/AppConfigProvider.tsx/AppConfigProvider.tsx';
+import AppConfigProvider from './providers/AppConfigProvider/AppConfigProvider.tsx';
 import './index.css';
 import NotificationProvider from './providers/NotificationProvider/NotificationProvider.tsx';
 createRoot(document.getElementById('root')!).render(
