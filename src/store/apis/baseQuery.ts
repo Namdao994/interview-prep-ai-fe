@@ -136,8 +136,21 @@ import type {ApiErrorResponse, ApiMessageResponse} from '@/shared/types/api';
 export const rawBaseQuery = fetchBaseQuery({
   baseUrl: env.API_BASE_URL,
   credentials: 'include',
+
   prepareHeaders(headers, {arg}) {
     const method = typeof arg === 'string' ? 'GET' : (arg.method?.toUpperCase() ?? 'GET');
+
+    const accessToken = getCookie('accessToken');
+
+    if (accessToken) {
+      headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const refreshToken = getCookie('refreshToken');
+
+    if (refreshToken) {
+      headers.set('Authorization', `Bearer ${refreshToken}`);
+    }
 
     if (method !== 'GET') {
       const csrfToken = getCookie('csrfToken');
@@ -145,9 +158,11 @@ export const rawBaseQuery = fetchBaseQuery({
         headers.set('x-csrf-token', csrfToken);
       }
     }
+
     return headers;
   },
 });
+
 let refreshTokenPromise: Promise<void> | null = null;
 let refreshCsrfPromise: Promise<void> | null = null;
 let authErrorHandled = false;
