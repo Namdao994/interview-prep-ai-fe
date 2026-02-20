@@ -18,15 +18,6 @@ export const rawBaseQuery = fetchBaseQuery({
   prepareHeaders(headers, {arg}) {
     const method = typeof arg === 'string' ? 'GET' : (arg.method?.toUpperCase() ?? 'GET');
 
-    const accessToken = getCookie('accessToken');
-    const refreshToken = getCookie('refreshToken');
-    if (accessToken) {
-      headers.set('Authorization', `Bearer ${accessToken}`);
-    }
-
-    if (refreshToken) {
-      headers.set('x-refresh-token', refreshToken);
-    }
     if (method !== 'GET') {
       const csrfToken = getCookie('csrfToken');
       if (csrfToken) {
