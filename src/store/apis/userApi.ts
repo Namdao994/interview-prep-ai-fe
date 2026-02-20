@@ -9,7 +9,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getMe: builder.query<User, void>({
       query: () => ({
-        url: '/auth/my-profile',
+        url: '/user/my-profile',
       }),
       transformResponse: (res: ApiDataResponse<User>) => res.data,
     }),
