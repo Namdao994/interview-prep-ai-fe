@@ -264,6 +264,6 @@ export const {
   useUnarchiveSessionMutation,
 } = sessionApi;
 
-export const generateQuestionsApi = (sessionId: string) => {
-  return new EventSource(`${env.API_BASE_URL}/ai/generate-questions/${sessionId}`, {withCredentials: true});
+export const generateQuestionsApi = (sessionId: string, accessToken: string) => {
+  return new EventSource(`${env.API_BASE_URL}/ai/generate-questions/${sessionId}?accessToken=${accessToken}`);
 };

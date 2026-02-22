@@ -9,7 +9,6 @@ const CreateSessionModal = ({...props}: CreateSessionModalProps) => {
   const navigate = useNavigate();
   const [createSession] = useCreateSessionMutation();
   const onFinish: FormProps<FieldTypeSessionCreateForm>['onFinish'] = async (values) => {
-    console.log('Success:', values);
     try {
       const createSessionResult = await createSession(values).unwrap();
       console.log('createSessionResult', createSessionResult);
@@ -26,7 +25,10 @@ const CreateSessionModal = ({...props}: CreateSessionModalProps) => {
         onFinish={onFinish}
         autoComplete='off'
         initialValues={{
+          targetRole: 'Frontend Developer',
           experience: 1,
+          topicsToFocus: 'React, javascript, html, tailwindcss',
+          description: 'Goal',
         }}
       >
         <Form.Item<FieldTypeSessionCreateForm>

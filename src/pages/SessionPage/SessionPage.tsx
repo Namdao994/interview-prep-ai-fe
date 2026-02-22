@@ -20,7 +20,7 @@ import LoadingSessionOverview from './LoadingSessionOverview/LoadingSessionOverv
 import {formatSessionDateFullMonth} from '@/utils/date';
 import useQuestionSSE from './hooks/useQuestionSSE';
 import type {Question} from '@/shared/types/question';
-import {useAppDispatch} from '@/store/hooks';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {
   addDiscussion,
   setCurrentQuestionId,
@@ -56,6 +56,7 @@ const SessionPage = () => {
     useDeleteSessionMutation();
   const [archiveSession, {isLoading: isArchiveSessionLoading, isSuccess: isArchiveSessionSuccess}] =
     useArchiveSessionMutation();
+  const {accessToken} = useAppSelector((state) => state.auth);
   useEffect(() => {
     if (isDeleteSessionSuccess || isArchiveSessionSuccess) {
       navigate('/dashboard', {replace: true});
@@ -115,8 +116,8 @@ const SessionPage = () => {
   };
 
   const handleLoadMoreQuestion = () => {
-    if (!session) return;
-    const es = generateQuestionsApi(session.id);
+    if (!session || !accessToken) return;
+    const es = generateQuestionsApi(session.id, accessToken);
     eventSourceRef.current = es;
     es.addEventListener('open', () => {
       setIsSseOpen(true);

@@ -7,7 +7,7 @@ import type React from 'react';
 import type {ModalType} from '../types';
 import {useLoginMutation} from '@/store/apis/authApi';
 import {useAppDispatch} from '@/store/hooks';
-import {setRegisterEmail, setUser} from '@/store/slices/authSlice';
+import {setAccessToken, setRefreshToken, setRegisterEmail, setUser} from '@/store/slices/authSlice';
 import {useNavigate} from 'react-router';
 import {showNotification} from '@/store/slices/notificationSlice';
 import env from '@/configs/env';
@@ -34,8 +34,11 @@ const LoginModalContent: React.FC<LoginModalContentProps> = ({setCurrentModal}) 
         password,
       }).unwrap();
       if (res.data) {
-        dispatch(setUser(res.data));
+        console.log('res.data', res);
+        dispatch(setUser(res.data.user));
         dispatch(showNotification({type: 'success', content: res.message}));
+        dispatch(setAccessToken(res.data.accessToken));
+        dispatch(setRefreshToken(res.data.refreshToken));
         navigate('/dashboard');
       }
     } catch (error) {
@@ -60,7 +63,15 @@ const LoginModalContent: React.FC<LoginModalContentProps> = ({setCurrentModal}) 
 
   return (
     <Flex vertical gap='small'>
-      <Form onFinish={onFinish} autoComplete='off' disabled={isLoading}>
+      <Form
+        onFinish={onFinish}
+        autoComplete='off'
+        disabled={isLoading}
+        initialValues={{
+          email: 'namdao994@gmail.com',
+          password: '12345678',
+        }}
+      >
         <Form.Item<FieldType>
           layout='vertical'
           label='Email'
@@ -107,13 +118,13 @@ const LoginModalContent: React.FC<LoginModalContentProps> = ({setCurrentModal}) 
       </Form>
       <Divider style={{margin: 0}}>OR</Divider>
       <Flex vertical gap='middle'>
-        <ProviderButton provider='google' disabled={isLoading} onClick={handleLoginWithGoogle}>
+        <ProviderButton provider='google' disabled={true} onClick={handleLoginWithGoogle}>
           Continue with Google
         </ProviderButton>
-        <ProviderButton provider='github' disabled={isLoading} onClick={handleLoginWithGithub}>
+        <ProviderButton provider='github' disabled={true} onClick={handleLoginWithGithub}>
           Continue with GitHub
         </ProviderButton>
-        <ProviderButton provider='discord' disabled={isLoading} onClick={handleLoginWithDiscord}>
+        <ProviderButton provider='discord' disabled={true} onClick={handleLoginWithDiscord}>
           Continue with Discord
         </ProviderButton>
       </Flex>

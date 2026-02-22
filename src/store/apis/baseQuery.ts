@@ -6,29 +6,28 @@ type ExtraOptions = {
 import {fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import type {BaseQueryApi, FetchArgs} from '@reduxjs/toolkit/query/react';
 import env from '@/configs/env';
-import {getCookie} from '@/utils/cookies';
 import {showNotification} from '../slices/notificationSlice';
-import {logout} from '../slices/authSlice';
+import {logout, setAccessToken, setRefreshToken} from '../slices/authSlice';
 import {ErrorCode} from '@/constants/errorCodes';
-import type {ApiErrorResponse, ApiMessageResponse} from '@/shared/types/api';
+import type {ApiDataResponse, ApiErrorResponse, ApiMessageResponse} from '@/shared/types/api';
+import type {RootState} from '../types';
 
 export const rawBaseQuery = fetchBaseQuery({
   baseUrl: env.API_BASE_URL,
-  credentials: 'include',
-  prepareHeaders(headers, {arg}) {
-    const method = typeof arg === 'string' ? 'GET' : (arg.method?.toUpperCase() ?? 'GET');
-
-    if (method !== 'GET') {
-      const csrfToken = getCookie('csrfToken');
-      if (csrfToken) {
-        headers.set('x-csrf-token', csrfToken);
-      }
+  prepareHeaders(headers, {getState}) {
+    const state = getState() as RootState;
+    const accessToken = state.auth.accessToken;
+    const refreshToken = state.auth.refreshToken;
+    if (accessToken) {
+      headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+    if (refreshToken) {
+      headers.set('x-refresh-token', refreshToken);
     }
     return headers;
   },
 });
 let refreshTokenPromise: Promise<void> | null = null;
-let refreshCsrfPromise: Promise<void> | null = null;
 let authErrorHandled = false;
 async function refreshAccessToken(api: BaseQueryApi, extraOptions: ExtraOptions) {
   if (!refreshTokenPromise) {
@@ -38,6 +37,10 @@ async function refreshAccessToken(api: BaseQueryApi, extraOptions: ExtraOptions)
       if (res.error) {
         throw res.error;
       }
+      const {accessToken, refreshToken} = (res.data as ApiDataResponse<{accessToken: string; refreshToken: string}>)
+        .data;
+      api.dispatch(setAccessToken(accessToken));
+      api.dispatch(setRefreshToken(refreshToken));
     })().finally(() => {
       refreshTokenPromise = null;
     });
@@ -46,21 +49,6 @@ async function refreshAccessToken(api: BaseQueryApi, extraOptions: ExtraOptions)
   await refreshTokenPromise;
 }
 
-async function refreshCsrfToken(api: BaseQueryApi, extraOptions: ExtraOptions) {
-  if (!refreshCsrfPromise) {
-    refreshCsrfPromise = (async () => {
-      const res = await rawBaseQuery({url: '/auth/rotate-csrf', method: 'POST'}, api, extraOptions);
-
-      if (res.error) {
-        throw res.error;
-      }
-    })().finally(() => {
-      refreshCsrfPromise = null;
-    });
-  }
-
-  await refreshCsrfPromise;
-}
 export const baseQueryWithMiddleware = async (
   args: string | FetchArgs,
   api: BaseQueryApi,
@@ -83,12 +71,6 @@ export const baseQueryWithMiddleware = async (
     // ===== 1. ACCESS TOKEN EXPIRED =====
     if (errorCode === ErrorCode.TOKEN_EXPIRED) {
       await refreshAccessToken(api, extraOptions);
-      result = await rawBaseQuery(args, api, extraOptions);
-    }
-
-    // ===== 2. CSRF TOKEN EXPIRED =====
-    if (errorCode === ErrorCode.CSRF_TOKEN_EXPIRED) {
-      await refreshCsrfToken(api, extraOptions);
       result = await rawBaseQuery(args, api, extraOptions);
     }
   } catch {

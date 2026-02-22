@@ -1,7 +1,7 @@
 import type {Question} from '@/shared/types/question';
 import type {Session} from '@/shared/types/session';
 import {generateQuestionsApi, sessionApi} from '@/store/apis/sessionApi';
-import {useAppDispatch} from '@/store/hooks';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 type UseQuestionSSEParams = {
@@ -15,9 +15,10 @@ const useQuestionSSE = ({session, onDone}: UseQuestionSSEParams) => {
   const eventSourceRef = useRef<EventSource | null>(null);
   const [isSseOpen, setIsSseOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const {accessToken} = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (!sessionId) {
+    if (!sessionId || !accessToken) {
       navigate('/404');
       return;
     }
@@ -30,7 +31,7 @@ const useQuestionSSE = ({session, onDone}: UseQuestionSSEParams) => {
       return;
     }
 
-    const es = generateQuestionsApi(sessionId);
+    const es = generateQuestionsApi(sessionId, accessToken);
 
     eventSourceRef.current = es;
 

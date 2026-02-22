@@ -9,11 +9,15 @@ export interface User {
 interface AuthState {
   user: User | null;
   registerEmail: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
   registerEmail: null,
+  accessToken: null,
+  refreshToken: null,
 };
 
 const authSlice = createSlice({
@@ -41,6 +45,20 @@ const authSlice = createSlice({
       if (!state.user) return;
       state.user.name = action.payload;
     },
+    setAccessToken(state, action: PayloadAction<string>) {
+      state.accessToken = action.payload;
+    },
+    setRefreshToken(state, action: PayloadAction<string>) {
+      state.refreshToken = action.payload;
+    },
+
+    clearAccessToken(state) {
+      state.accessToken = null;
+    },
+    clearRefreshToken(state) {
+      state.refreshToken = null;
+    },
+
     logout(state) {
       state.user = null;
     },
@@ -55,10 +73,14 @@ export const {
   changeUsername,
   setRegisterEmail,
   clearRegisterEmail,
+  setAccessToken,
+  setRefreshToken,
+  clearAccessToken,
+  clearRefreshToken,
 } = authSlice.actions;
 export default authSlice.reducer;
 export const authPersistConfig = {
   key: 'auth',
   storage,
-  whitelist: ['user'],
+  whitelist: ['user', 'accessToken', 'refreshToken'],
 };
